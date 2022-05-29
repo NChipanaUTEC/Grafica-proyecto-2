@@ -46,7 +46,7 @@ public:
     virtual void calcularBoundingBox() = 0;
 };
 
-class Esfera:public Objeto{
+class Esfera:public Objeto {
 public:
     vec3 centro;
     float radius;
@@ -142,7 +142,7 @@ public:
         }
     }
     void actualizarDatos(float t) {
-        if(afectaGravedad){
+        if(afectaGravedad) {
             float g = 9.8;
             centro.x = pos_ini.x + vel_ini.x * cos(radians(ang_ini)) * t;
             centro.y = pos_ini.y + vel_ini.y * sin(radians(ang_ini)) * t - 0.5 * g * t * t;
