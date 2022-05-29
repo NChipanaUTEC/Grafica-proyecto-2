@@ -45,7 +45,7 @@ public:
     virtual void calcularBoundingBox() = 0;
 };
 
-class Esfera:public Objeto{
+class Esfera:public Objeto {
 public:
     vec3 centro;
     float radius;

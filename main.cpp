@@ -42,7 +42,7 @@ vector<Objeto*> pObjetos;
 Esfera esfera(vec3(0),2., 100, 100);
 bool proyectil_listo = false;
 
-void Escena1(){
+void Escena1() {
     Esfera *esfera1 = new Esfera(vec3(10, 0,0));
     esfera1->vao = esfera.vao;
     esfera1->indices_size = esfera.indices_size;
@@ -181,8 +181,8 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
-        if (!proyectil_listo){
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        if (!proyectil_listo) {
             float x = rand()%10;
             float y = rand()%10;
             float z = rand()%10;
@@ -199,7 +199,7 @@ void processInput(GLFWwindow *window)
             tiempoInicial = static_cast<float>(glfwGetTime());
         }
     }
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE){
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE) {
         proyectil_listo = false;
 
 

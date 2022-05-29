@@ -14,7 +14,9 @@ public:
 class BoundingBox : public BoundingVolume {
 public:
     vec3 min, max;
-    bool Colision(BoundingVolume &bv) { return false; }
+    bool Colision(BoundingVolume &bv) {
+        return false;
+    }
     bool Colision(BoundingBox &bv) {
         return (min.x <= bv.max.x && max.x >= bv.min.x) &&
                (min.y <= bv.max.y && max.y >= bv.min.y) &&

@@ -69,7 +69,7 @@ GLuint Esfera::setup() {
     return vao;
 }
 
-void Esfera::display(Shader &sh){
+void Esfera::display(Shader &sh) {
     model = mat4(1.0);
     model = scale(model, vec3(0.5));
     model = translate(model, centro);
@@ -81,7 +81,7 @@ void Esfera::display(Shader &sh){
     }
 }
 
-void Esfera::actualizarDatos(float t){
+void Esfera::actualizarDatos(float t) {
     float g = 9.8;
     centro.x = pos_ini.x + vel_ini.x * cos(radians(ang_ini)) * t;
     centro.y = pos_ini.y + vel_ini.y * sin(radians(ang_ini)) * t - 0.5 * g * t * t;
