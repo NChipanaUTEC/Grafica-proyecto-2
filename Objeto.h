@@ -148,9 +148,11 @@ public:
     }
     void calcularColision(vector<Objeto*> pObjetos) {
         for (auto &obj : pObjetos) {
-            if (bb->Colision( *obj->bb) ) {
+            if (obj != this && bb->Colision( *obj->bb)) {
                 // reacciónar a la colision
+                cout << "Colisiono\n";
             }
+
         }
     }
     void calcularBoundingBox() {

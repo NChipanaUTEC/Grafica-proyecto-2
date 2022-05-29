@@ -50,12 +50,6 @@ void Escena1(){
     esfera1->calcularBoundingBox();
     pObjetos.emplace_back(esfera1);
 
-    Esfera *esfera2 = new Esfera(vec3(14, 0,0));
-    esfera2->vao = esfera.vao;
-    esfera2->indices_size = esfera.indices_size;
-    esfera2->radius = esfera.radius;
-    esfera2->calcularBoundingBox();
-    pObjetos.emplace_back(esfera2);
 }
 
 int main() {
