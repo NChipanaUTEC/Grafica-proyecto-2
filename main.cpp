@@ -8,7 +8,7 @@
 #include "shader_m.h"
 #include "camera.h"
 #include "Objeto.h"
-#include "BoundingVolume.h"
+// #include "BoundingVolume.h"
 
 #include <iostream>
 
@@ -47,14 +47,14 @@ void Escena1(){
     esfera1->vao = esfera.vao;
     esfera1->indices_size = esfera.indices_size;
     esfera1->radius = esfera.radius;
-    esfera1->bv = new BoundingBox();
+    esfera1->calcularBoundingBox();
     pObjetos.emplace_back(esfera1);
 
     Esfera *esfera2 = new Esfera(vec3(14, 0,0));
     esfera2->vao = esfera.vao;
     esfera2->indices_size = esfera.indices_size;
     esfera2->radius = esfera.radius;
-    esfera2->bv = new BoundingBox();
+    esfera2->calcularBoundingBox();
     pObjetos.emplace_back(esfera2);
 }
 
@@ -190,7 +190,7 @@ void processInput(GLFWwindow *window)
             esfera1->vao = esfera.vao;
             esfera1->indices_size = esfera.indices_size;
             esfera1->radius = esfera.radius;
-            esfera1->bv = new BoundingBox();
+            esfera1->calcularBoundingBox();
             pObjetos.emplace_back(esfera1);
             proyectil_listo = true;
             esfera1->vel_ini = vec3(10,10,0);

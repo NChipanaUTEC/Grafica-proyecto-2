@@ -1,7 +1,3 @@
-//
-// Created by hgallegos on 20/05/2022.
-//
-
 #include "Objeto.h"
 #include "BoundingVolume.h"
 
