@@ -32,6 +32,7 @@ public:
     GLuint vao;
     mat4 model;
     bool visible=true;
+    bool afectaGravedad=true;
     BoundingBox *bb;
     GLint POSITION_ATTRIBUTE=0, NORMAL_ATTRIBUTE=1, TEXCOORD0_ATTRIBUTE=8;
 
@@ -141,10 +142,12 @@ public:
         }
     }
     void actualizarDatos(float t) {
-        float g = 9.8;
-        centro.x = pos_ini.x + vel_ini.x * cos(radians(ang_ini)) * t;
-        centro.y = pos_ini.y + vel_ini.y * sin(radians(ang_ini)) * t - 0.5 * g * t * t;
-        cout<< t << "\t" << to_string(pos_ini) << "\t" << to_string(centro) << endl;
+        if(afectaGravedad){
+            float g = 9.8;
+            centro.x = pos_ini.x + vel_ini.x * cos(radians(ang_ini)) * t;
+            centro.y = pos_ini.y + vel_ini.y * sin(radians(ang_ini)) * t - 0.5 * g * t * t;
+        }
+        //cout<< t << "\t" << to_string(pos_ini) << "\t" << to_string(centro) << endl;
     }
     void calcularColision(vector<Objeto*> pObjetos) {
         for (auto &obj : pObjetos) {
