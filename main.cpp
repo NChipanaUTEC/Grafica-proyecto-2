@@ -39,16 +39,18 @@ int luna_numIndices;
 GLint POSITION_ATTRIBUTE=0, NORMAL_ATTRIBUTE=1, TEXCOORD0_ATTRIBUTE=8;
 
 vector<Objeto*> pObjetos;
-Esfera esfera(vec3(0),2., 100, 100);
+Esfera esfera_plantilla(vec3(0),2., 100, 100);
+Esfera* esfera_prota = new Esfera(vec3(10,0,0)); 
 bool proyectil_listo = false;
+bool proyectil_lanzado = false;
 
 void Escena1(){
-    Esfera *esfera1 = new Esfera(vec3(10, 0,0));
-    esfera1->vao = esfera.vao;
-    esfera1->indices_size = esfera.indices_size;
-    esfera1->radius = esfera.radius;
-    esfera1->calcularBoundingBox();
-    pObjetos.emplace_back(esfera1);
+    esfera_prota->vao = esfera_plantilla.vao;
+    esfera_prota->indices_size = esfera_plantilla.indices_size;
+    esfera_prota->radius = esfera_plantilla.radius;
+    esfera_prota->calcularBoundingBox();
+    esfera_prota->afectaGravedad = false;
+    pObjetos.emplace_back(esfera_prota);
 
 }
 
@@ -96,7 +98,7 @@ int main() {
     Shader lightingShader("./2.2.basic_lighting.vs", "./2.2.basic_lighting.fs");
     //Shader lightCubeShader("../2.2.light_cube.vs", "../2.2.light_cube.fs");
 
-    esfera.vao = esfera.setup();
+    esfera_plantilla.vao = esfera_plantilla.setup();
     Escena1();
 
 
@@ -176,21 +178,23 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
-        if (!proyectil_listo){
-            float x = rand()%10;
-            float y = rand()%10;
-            float z = rand()%10;
+        if (!proyectil_listo && !proyectil_lanzado){
+            float x = esfera_prota->centro.x + rand() % 10 - 5;
+            float y = esfera_prota->centro.y + rand() % 10 - 5;
+            float z = esfera_prota->centro.z + rand() % 10 - 5;
             Esfera *esfera1 = new Esfera(vec3(x,y,z));
-            esfera1->vao = esfera.vao;
-            esfera1->indices_size = esfera.indices_size;
-            esfera1->radius = esfera.radius;
+            esfera1->vao = esfera_plantilla.vao;
+            esfera1->indices_size = esfera_plantilla.indices_size;
+            esfera1->radius = esfera_plantilla.radius;
             esfera1->calcularBoundingBox();
             pObjetos.emplace_back(esfera1);
             proyectil_listo = true;
-            esfera1->vel_ini = vec3(10,10,0);
+            proyectil_lanzado = true;
+            esfera1->vel_ini = vec3(25,25,0);
             esfera1->pos_ini = vec3(x,y,z);
-            esfera1->ang_ini = 45;
+            esfera1->ang_ini = rand() % 360;
             tiempoInicial = static_cast<float>(glfwGetTime());
+            esfera_prota->visible = false;
         }
     }
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE){
