@@ -52,6 +52,8 @@ void Escena1(){
     esfera_prota->afectaGravedad = false;
     pObjetos.emplace_back(esfera_prota);
 
+    // Caja cajita;
+    // cajita.vao = cajita.setup();
 }
 
 int main() {
