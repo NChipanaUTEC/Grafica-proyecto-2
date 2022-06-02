@@ -41,19 +41,22 @@ GLint POSITION_ATTRIBUTE=0, NORMAL_ATTRIBUTE=1, TEXCOORD0_ATTRIBUTE=8;
 vector<Objeto*> pObjetos;
 Esfera esfera_plantilla(vec3(0),2., 100, 100);
 Esfera* esfera_prota = new Esfera(vec3(10,0,0)); 
+Caja* caja_prota = new Caja(vec3(0,0,0));
 bool proyectil_listo = false;
 bool proyectil_lanzado = false;
 
 void Escena1(){
-    esfera_prota->vao = esfera_plantilla.vao;
-    esfera_prota->indices_size = esfera_plantilla.indices_size;
-    esfera_prota->radius = esfera_plantilla.radius;
-    esfera_prota->calcularBoundingBox();
-    esfera_prota->afectaGravedad = false;
-    pObjetos.emplace_back(esfera_prota);
-
-    // Caja cajita;
-    // cajita.vao = cajita.setup();
+    // esfera_prota->vao = esfera_plantilla.vao;
+    // esfera_prota->indices_size = esfera_plantilla.indices_size;
+    // esfera_prota->radius = esfera_plantilla.radius;
+    // esfera_prota->calcularBoundingBox();
+    // esfera_prota->afectaGravedad = false;
+    // pObjetos.emplace_back(esfera_prota);
+    caja_prota->setup();
+    caja_prota->indices_size = caja_prota->indices.size();
+    caja_prota->calcularBoundingBox();
+    caja_prota->afectaGravedad = false;
+    pObjetos.emplace_back(caja_prota);
 }
 
 int main() {

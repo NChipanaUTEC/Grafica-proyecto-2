@@ -30,6 +30,7 @@ public:
     vector<GLuint> indices;
     GLuint indices_size;
     GLuint vao;
+    GLuint vbo;
     mat4 model;
     bool visible=true;
     bool afectaGravedad=true;
@@ -167,68 +168,136 @@ public:
 
 class Caja : public Objeto {
 public:
-    vec3 posmin, posmax;
+    vec3 posmin, posmax,centro;
     Caja() {
         posmin = vec3(0.0);
         posmax = vec3(1.0);
     }
-    GLuint setup() {
-        GLfloat vertices[] = {
-            -1.0f,  1.0f,  0.0f,
-            -1.0f, -1.0f,  0.0f,
-             1.0f,  1.0f,  0.0f,
-             1.0f, -1.0f,  0.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-             1.0f,  1.0f, -1.0f,
-             1.0f, -1.0f, -1.0f
+    Caja(vec3 centro){
+        posmin = centro - vec3(0.5);
+        posmax = centro + vec3(0.5);
+        this->centro = centro;
+    }
+    GLuint setup(){
+        int vertices[24] = {
+            -1, -1, -1,
+            1, -1, -1,
+            1, 1, -1,
+            -1, 1, -1,
+            -1, -1, 1,
+            1, -1, 1,
+            1, 1, 1,
+            -1, 1, 1
         };
 
-        unsigned int indices[] = {
-            0, 2, 3, 0, 3, 1,
-            2, 6, 7, 2, 7, 3,
-            6, 4, 5, 6, 5, 7,
-            4, 0, 1, 4, 1, 5,
-            0, 4, 6, 0, 6, 2,
-            1, 5, 7, 1, 7, 3,
+        vec2 texCoords[4] ={
+            vec2(0, 0),
+            vec2(1, 0),
+            vec2(1, 1),
+            vec2(0, 1)
         };
 
-        GLuint VAO,VBO,IBO;
-        glGenVertexArrays(1, &VAO);
-        glBindVertexArray(VAO);
+        vec3 normals[6] = {
+            vec3(0, 0, 1),
+            vec3(1, 0, 0),
+            vec3(0, 0, -1),
+            vec3(-1, 0, 0),
+            vec3(0, 1, 0),
+            vec3(0, -1, 0)
+        };
 
-        glGenBuffers(1, &IBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0])*6, indices, GL_STATIC_DRAW);
+        int indices[6 * 6] = {
+            0, 1, 3, 3, 1, 2,
+            1, 5, 2, 2, 5, 6,
+            5, 4, 6, 6, 4, 7,
+            4, 0, 7, 7, 0, 3,
+            3, 2, 7, 7, 2, 6,
+            4, 5, 0, 0, 5, 1
+        };
 
-        glGenBuffers(1, &VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        int texInds[6] = { 0, 1, 3, 3, 1, 2 };
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0])*3, vertices, GL_STATIC_DRAW);
+        float vertexBuffer[18 * 6];
+        for (int i = 0; i < 36; i++) {
+            vertexBuffer[i * 3 + 0] = vertices[indices[i]];
+            vertexBuffer[i * 3 + 1] = vertices[indices[i]+1];
+            vertexBuffer[i * 3 + 2] = vertices[indices[i]+2];
+        }
 
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+        float textureBuffer[12 * 6];
+        for (int i = 0; i < 36; i++) {
+            textureBuffer[i * 2 + 0] = texCoords[texInds[i % 4]].x;
+            textureBuffer[i * 2 + 1] = texCoords[texInds[i % 4]].y;
+        }
 
-        glEnableVertexAttribArray(0);
+        float normalBuffer[18 * 6];
+        for (int i = 0; i < 36; i++) {
+            normalBuffer[i * 3 + 0] = normals[indices[i / 6]].x;
+            normalBuffer[i * 3 + 1] = normals[indices[i / 6]].y;
+            normalBuffer[i * 3 + 2] = normals[indices[i / 6]].z;
+        }
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        GLuint vao;
+        glGenVertexArrays( 1, &vao );
+        glBindVertexArray( vao );
 
-        glBindVertexArray(0);
+        GLuint vbo;
+        glGenBuffers( 1, &vbo );
+        glBindBuffer( GL_ARRAY_BUFFER, vbo );
+        glBufferData( GL_ARRAY_BUFFER, sizeof(vertexBuffer)*24, vertexBuffer, GL_STATIC_DRAW );
+        glEnableVertexAttribArray( POSITION_ATTRIBUTE );
+        glVertexAttribPointer( POSITION_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
 
-        return VAO;
+
+        this->vao = vao;
+        this->vbo = vbo;
+        return vao;
     }
-    void display(Shader &sh) {
+    void display(Shader &sh){
+        model = mat4(1.0);
+        model = scale(model, vec3(0.5));
+        model = translate(model, centro);
+        sh.setMat4("model", model);
+        if (visible) {
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            glOrtho(-1, 1, -1.f, 1.f, 1.f, -1.f);
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
 
-        glBindVertexArray(this->vao);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo); 
+            glEnableVertexAttribArray( POSITION_ATTRIBUTE );
+            glVertexAttribPointer( POSITION_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
 
+            glDrawArrays(GL_TRIANGLES, 0, 24); 
 
-        glDrawElements(GL_TRIANGLES,6, GL_UNSIGNED_INT, 0);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+            glDisableVertexAttribArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
     }
-    void actualizarDatos(float t);
-    void calcularColision(vector<Objeto*> pObjetos);
-    void calcularBoundingBox();
+
+    void calcularColision(vector<Objeto*> pObjetos) {
+        for (auto &obj : pObjetos) {
+            if (obj != this && bb->Colision( *obj->bb)) {
+                // reacciónar a la colision
+                cout << "Colisionó caja\n";
+            }
+
+        }
+    }
+    void calcularBoundingBox() {
+        bb = new BoundingBox();
+        bb->min = centro - posmin;
+        bb->max = centro + posmax;
+    }
+    void actualizarDatos(float t){
+        if(afectaGravedad){
+            float g = 9.8;
+            centro.x = pos_ini.x + vel_ini.x * cos(radians(ang_ini)) * t;
+            centro.y = pos_ini.y + vel_ini.y * sin(radians(ang_ini)) * t - 0.5 * g * t * t;
+        }
+
+    }
 };
 
 #endif //LEARNOPENGL_OBJETO_H
