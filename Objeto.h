@@ -259,12 +259,6 @@ public:
         model = translate(model, centro);
         sh.setMat4("model", model);
         if (visible) {
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
-            glOrtho(-1, 1, -1.f, 1.f, 1.f, -1.f);
-            glMatrixMode(GL_MODELVIEW);
-            glLoadIdentity();
-
             glBindBuffer(GL_ARRAY_BUFFER, vbo); 
             glEnableVertexAttribArray( POSITION_ATTRIBUTE );
             glVertexAttribPointer( POSITION_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
