@@ -42,7 +42,7 @@ float lastFrame = 0.0f;
 float tiempoInicial = 0.0f, tiempoTranscurrido= 0.0f;
 
 // lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(30.2f, 10.0f, 2.0f);
 GLuint luna_vao;
 int luna_numIndices;
 GLint POSITION_ATTRIBUTE=0, NORMAL_ATTRIBUTE=1, TEXCOORD0_ATTRIBUTE=8;
@@ -56,7 +56,7 @@ void Escena1(){
     esfera_prota->afectaGravedad = false;
     pObjetos.emplace_back(esfera_prota);
 
-    Caja* caja = new Caja(vec3(-10,-102,0),100.0f);
+    Caja* caja = new Caja(vec3(-10,-103,0),100.0f);
     caja->vao = caja->setup();
     caja->calcularBoundingBox();
     caja->afectaGravedad = false;
@@ -185,11 +185,10 @@ int main() {
         // cuboShader.setMat4("projection", projection);
         // cuboShader.setMat4("view", view);
 
-        for (auto &esf : pObjetos ) {
-            esf->actualizarDatos(tiempoTranscurrido);
-            esf->calcularColision(pObjetos);
-            esf->display(lightingShader);
-             
+        for (auto &obj : pObjetos ) {
+            obj->actualizarDatos(tiempoTranscurrido);
+            obj->calcularColision(pObjetos);
+            obj->display(lightingShader);
         }
 
 

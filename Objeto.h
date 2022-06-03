@@ -44,8 +44,19 @@ public:
     virtual GLuint setup()=0;
     virtual void display(Shader &sh)=0;
     virtual void actualizarDatos(float t)=0;
-    virtual void calcularColision(vector<Objeto*> pObjetos)=0;
     virtual void calcularBoundingBox() = 0;
+    void calcularColision(vector<Objeto*> pObjetos) {
+        for (auto &obj : pObjetos) {
+            if (obj != this &&
+                this->bb->Colision( *obj->bb) && 
+                obj->visible &&
+                this->esPrincipal) {
+                // reacciónar a la colision
+                cout << "Colision \n";
+                obj->visible = false;
+            }
+        }
+    }
 };
 
 class Esfera:public Objeto{
@@ -152,19 +163,6 @@ public:
             calcularBoundingBox();
         }
         //cout<< t << "\t" << to_string(pos_ini) << "\t" << to_string(centro) << endl;
-    }
-    void calcularColision(vector<Objeto*> pObjetos) {
-        for (auto &obj : pObjetos) {
-            if (obj != this &&
-                this->bb->Colision( *obj->bb) && 
-                obj->visible &&
-                this->esPrincipal) {
-                // reacciónar a la colision
-                cout << "Colision \n";
-                
-            }
-
-        }
     }
     void calcularBoundingBox() {
         bb = new BoundingBox();
@@ -273,15 +271,6 @@ public:
             float g = 9.8;
             centro.x = pos_ini.x + vel_ini.x * cos(radians(ang_ini)) * t;
             centro.y = pos_ini.y + vel_ini.y * sin(radians(ang_ini)) * t - 0.5 * g * t * t;
-        }
-    }
-    void calcularColision(vector<Objeto*> pObjetos) {
-        for (auto &obj : pObjetos) {
-            if (obj != this && bb->Colision( *obj->bb)) {
-                // reacciónar a la colision
-                cout << "Colisiono\n";
-            }
-
         }
     }
     void calcularBoundingBox() {
