@@ -40,13 +40,13 @@ GLint POSITION_ATTRIBUTE=0, NORMAL_ATTRIBUTE=1, TEXCOORD0_ATTRIBUTE=8;
 
 vector<Objeto*> pObjetos;
 Esfera esfera_plantilla(vec3(0),2., 100, 100);
-Esfera* esfera_prota = new Esfera(vec3(0,0,0)); 
+Esfera* esfera_prota = new Esfera(vec3(0,0,0));
 float esfera_angulo = 0.0;
 float mouse_distancia = 0.0;
 bool proyectil_listo = false;
 bool proyectil_lanzado = false;
 
-void Escena1(){
+void Escena1() {
     esfera_prota->vao = esfera_plantilla.vao;
     esfera_prota->indices_size = esfera_plantilla.indices_size;
     esfera_prota->radius = esfera_plantilla.radius;
@@ -178,8 +178,8 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
-        if (!proyectil_listo && !proyectil_lanzado){
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        if (!proyectil_listo && !proyectil_lanzado) {
             esfera_prota->calcularBoundingBox();
             proyectil_listo = true;
             proyectil_lanzado = true;
@@ -191,7 +191,7 @@ void processInput(GLFWwindow *window)
 
         }
     }
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE){
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE) {
         proyectil_listo = false;
     }
 }
