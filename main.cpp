@@ -17,12 +17,21 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
+// variables globales
+vector<Objeto*> pObjetos;
+Esfera esfera_plantilla(vec3(0),2., 100, 100);
+Esfera* esfera_prota = new Esfera(vec3(0,0,0),true); 
+float esfera_angulo = 0.0;
+float mouse_distancia = 0.0;
+bool proyectil_listo = false;
+bool proyectil_lanzado = false;
+
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1280;
+const unsigned int SCR_HEIGHT = 720;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 20.0f));
+Camera camera(vec3(esfera_prota->centro.x, esfera_prota->centro.y, esfera_prota->centro.z+20.0f), vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -38,11 +47,6 @@ GLuint luna_vao;
 int luna_numIndices;
 GLint POSITION_ATTRIBUTE=0, NORMAL_ATTRIBUTE=1, TEXCOORD0_ATTRIBUTE=8;
 
-vector<Objeto*> pObjetos;
-Esfera esfera_plantilla(vec3(0),2., 100, 100);
-Esfera* esfera_prota = new Esfera(vec3(10,0,0)); 
-bool proyectil_listo = false;
-bool proyectil_lanzado = false;
 
 void Escena1(){
     esfera_prota->vao = esfera_plantilla.vao;
@@ -57,6 +61,54 @@ void Escena1(){
     caja->calcularBoundingBox();
     caja->afectaGravedad = false;
     pObjetos.emplace_back(caja);
+
+    Esfera* esfera1 = new Esfera(vec3(80,-4,0));
+    esfera1->vao = esfera_plantilla.vao;
+    esfera1->indices_size = esfera_plantilla.indices_size;
+    esfera1->radius = esfera_plantilla.radius;
+    esfera1->calcularBoundingBox();
+    esfera1->afectaGravedad = false;
+    pObjetos.emplace_back(esfera1);
+
+    Esfera* esfera2 = new Esfera(vec3(76,-4,0));
+    esfera2->vao = esfera_plantilla.vao;
+    esfera2->indices_size = esfera_plantilla.indices_size;
+    esfera2->radius = esfera_plantilla.radius;
+    esfera2->calcularBoundingBox();
+    esfera2->afectaGravedad = false;
+    pObjetos.emplace_back(esfera2);
+
+    Esfera* esfera3 = new Esfera(vec3(84,-4,0));
+    esfera3->vao = esfera_plantilla.vao;
+    esfera3->indices_size = esfera_plantilla.indices_size;
+    esfera3->radius = esfera_plantilla.radius;
+    esfera3->calcularBoundingBox();
+    esfera3->afectaGravedad = false;
+    pObjetos.emplace_back(esfera3);
+
+    Esfera* esfera4 = new Esfera(vec3(78,0,0));
+    esfera4->vao = esfera_plantilla.vao;
+    esfera4->indices_size = esfera_plantilla.indices_size;
+    esfera4->radius = esfera_plantilla.radius;
+    esfera4->calcularBoundingBox();
+    esfera4->afectaGravedad = false;
+    pObjetos.emplace_back(esfera4);
+
+    Esfera* esfera5 = new Esfera(vec3(82,0,0));
+    esfera5->vao = esfera_plantilla.vao;
+    esfera5->indices_size = esfera_plantilla.indices_size;
+    esfera5->radius = esfera_plantilla.radius;
+    esfera5->calcularBoundingBox();
+    esfera5->afectaGravedad = false;
+    pObjetos.emplace_back(esfera5);
+
+    Esfera* esfera6 = new Esfera(vec3(80,4,0));
+    esfera6->vao = esfera_plantilla.vao;
+    esfera6->indices_size = esfera_plantilla.indices_size;
+    esfera6->radius = esfera_plantilla.radius;
+    esfera6->calcularBoundingBox();
+    esfera6->afectaGravedad = false;
+    pObjetos.emplace_back(esfera6);
 }
 
 int main() {
@@ -112,10 +164,9 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         tiempoTranscurrido = currentFrame - tiempoInicial; //static_cast<float>(glfwGetTime());
-        cout << tiempoInicial << "\t";
         processInput(window);
         // render
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(128.0f/255.0f, 223.0f/255.0f, 255.0f/255.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // be sure to activate shader when setting uniforms/drawing objects
@@ -136,7 +187,6 @@ int main() {
 
         for (auto &esf : pObjetos ) {
             esf->actualizarDatos(tiempoTranscurrido);
-            // calcular si hay colision
             esf->calcularColision(pObjetos);
             esf->display(lightingShader);
              
@@ -167,39 +217,26 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
-        if (!proyectil_listo && !proyectil_lanzado){
-            float x = esfera_prota->centro.x + rand() % 10 - 5;
-            float y = esfera_prota->centro.y + rand() % 10 - 5;
-            float z = esfera_prota->centro.z + rand() % 10 - 5;
-            Esfera *esfera1 = new Esfera(vec3(x,y,z));
-            esfera1->vao = esfera_plantilla.vao;
-            esfera1->indices_size = esfera_plantilla.indices_size;
-            esfera1->radius = esfera_plantilla.radius;
-            esfera1->calcularBoundingBox();
-            pObjetos.emplace_back(esfera1);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && camera.Position.x > 0.0f)
+        camera.Position -= glm::normalize(glm::cross(camera.Front, camera.Up)) * camera.MovementSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && camera.Position.x < 40.0f)
+        camera.Position += glm::normalize(glm::cross(camera.Front, camera.Up)) * camera.MovementSpeed;
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && camera.Position.x == 0.0f && !proyectil_lanzado){
+        if (!proyectil_listo){
+            esfera_prota->calcularBoundingBox();
             proyectil_listo = true;
             proyectil_lanzado = true;
-            esfera1->vel_ini = vec3(25,25,0);
-            esfera1->pos_ini = vec3(x,y,z);
-            esfera1->ang_ini = rand() % 360;
+            esfera_prota->vel_ini = vec3(50*mouse_distancia,50*mouse_distancia,0);
+            esfera_prota->pos_ini = esfera_prota->centro;
+            esfera_prota->ang_ini = esfera_angulo - 180;
+            esfera_prota->afectaGravedad = true;
             tiempoInicial = static_cast<float>(glfwGetTime());
-            esfera_prota->visible = false;
         }
     }
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE){
         proyectil_listo = false;
-
-
     }
+    //cout << "Posicion: " << camera.Position.x << " " << camera.Position.y << " " << camera.Position.z << endl;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -218,20 +255,12 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
+    ypos = SCR_HEIGHT - ypos;
+    if (firstMouse) firstMouse = false;
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    // get distance of mouse pointer to center of window
+    mouse_distancia = sqrt(pow(xpos - SCR_WIDTH / 2, 2) + pow(ypos - SCR_HEIGHT / 2, 2)) / (sqrt(SCR_WIDTH * SCR_WIDTH + SCR_HEIGHT * SCR_HEIGHT)/2);
+    esfera_angulo = atan2(ypos-SCR_HEIGHT/2, xpos-SCR_WIDTH/2)*180/M_PI;
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
