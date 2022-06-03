@@ -18,11 +18,11 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1240;
+const unsigned int SCR_HEIGHT = 720;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 50.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 20.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -40,7 +40,9 @@ GLint POSITION_ATTRIBUTE=0, NORMAL_ATTRIBUTE=1, TEXCOORD0_ATTRIBUTE=8;
 
 vector<Objeto*> pObjetos;
 Esfera esfera_plantilla(vec3(0),2., 100, 100);
-Esfera* esfera_prota = new Esfera(vec3(10,0,0)); 
+Esfera* esfera_prota = new Esfera(vec3(0,0,0)); 
+float esfera_angulo = 0.0;
+float mouse_distancia = 0.0;
 bool proyectil_listo = false;
 bool proyectil_lanzado = false;
 
@@ -109,7 +111,6 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         tiempoTranscurrido = currentFrame - tiempoInicial; //static_cast<float>(glfwGetTime());
-        cout << tiempoInicial << "\t";
         processInput(window);
         // render
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -179,28 +180,19 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
         if (!proyectil_listo && !proyectil_lanzado){
-            float x = esfera_prota->centro.x + rand() % 10 - 5;
-            float y = esfera_prota->centro.y + rand() % 10 - 5;
-            float z = esfera_prota->centro.z + rand() % 10 - 5;
-            Esfera *esfera1 = new Esfera(vec3(x,y,z));
-            esfera1->vao = esfera_plantilla.vao;
-            esfera1->indices_size = esfera_plantilla.indices_size;
-            esfera1->radius = esfera_plantilla.radius;
-            esfera1->calcularBoundingBox();
-            pObjetos.emplace_back(esfera1);
+            esfera_prota->calcularBoundingBox();
             proyectil_listo = true;
             proyectil_lanzado = true;
-            esfera1->vel_ini = vec3(25,25,0);
-            esfera1->pos_ini = vec3(x,y,z);
-            esfera1->ang_ini = rand() % 360;
+            esfera_prota->vel_ini = vec3(50*mouse_distancia,50*mouse_distancia,0);
+            esfera_prota->pos_ini = esfera_prota->centro;
+            esfera_prota->ang_ini = esfera_angulo - 180;
+            esfera_prota->afectaGravedad = true;
             tiempoInicial = static_cast<float>(glfwGetTime());
-            esfera_prota->visible = false;
+
         }
     }
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE){
         proyectil_listo = false;
-
-
     }
 }
 
@@ -220,20 +212,12 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
+    ypos = SCR_HEIGHT - ypos;
+    if (firstMouse) firstMouse = false;
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    // get distance of mouse pointer to center of window
+    mouse_distancia = sqrt(pow(xpos - SCR_WIDTH / 2, 2) + pow(ypos - SCR_HEIGHT / 2, 2)) / (sqrt(SCR_WIDTH * SCR_WIDTH + SCR_HEIGHT * SCR_HEIGHT)/2);
+    esfera_angulo = atan2(ypos-SCR_HEIGHT/2, xpos-SCR_WIDTH/2)*180/M_PI;
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
