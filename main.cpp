@@ -22,7 +22,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 50.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 20.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -52,8 +52,11 @@ void Escena1(){
     esfera_prota->afectaGravedad = false;
     pObjetos.emplace_back(esfera_prota);
 
-    // Caja cajita;
-    // cajita.vao = cajita.setup();
+    Caja* caja = new Caja(vec3(-10,-102,0),100.0f);
+    caja->vao = caja->setup();
+    caja->calcularBoundingBox();
+    caja->afectaGravedad = false;
+    pObjetos.emplace_back(caja);
 }
 
 int main() {
@@ -98,11 +101,9 @@ int main() {
     // build and compile our shader zprogram
     // ------------------------------------
     Shader lightingShader("./2.2.basic_lighting.vs", "./2.2.basic_lighting.fs");
-    //Shader lightCubeShader("../2.2.light_cube.vs", "../2.2.light_cube.fs");
 
     esfera_plantilla.vao = esfera_plantilla.setup();
     Escena1();
-
 
     // render loop
     while (!glfwWindowShouldClose(window)) {
@@ -119,7 +120,7 @@ int main() {
 
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
-        lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+        lightingShader.setVec3("objectColor", 1.0f, 0.0f, 0.0f);
         lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightingShader.setVec3("lightPos", lightPos);
         lightingShader.setVec3("viewPos", camera.Position);
@@ -130,20 +131,15 @@ int main() {
         lightingShader.setMat4("projection", projection);
         lightingShader.setMat4("view", view);
 
-        // world transformation
-        /*glm::mat4 model = glm::mat4(1.0f);
-        model = glm::scale(model, glm::vec3(0.5));
-        lightingShader.setMat4("model", model);
-        if (aparece) {
-            glBindVertexArray(luna_vao);
-            glDrawElements(GL_TRIANGLES, luna_numIndices, GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-        }*/
+        // cuboShader.setMat4("projection", projection);
+        // cuboShader.setMat4("view", view);
+
         for (auto &esf : pObjetos ) {
             esf->actualizarDatos(tiempoTranscurrido);
             // calcular si hay colision
             esf->calcularColision(pObjetos);
             esf->display(lightingShader);
+             
         }
 
 

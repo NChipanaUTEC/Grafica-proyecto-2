@@ -31,6 +31,7 @@ public:
     GLuint indices_size;
     GLuint vao;
     mat4 model;
+    vec3 centro;
     bool visible=true;
     bool afectaGravedad=true;
     BoundingBox *bb;
@@ -48,7 +49,7 @@ public:
 
 class Esfera:public Objeto{
 public:
-    vec3 centro;
+    // vec3 centro;
     float radius;
     int slices, stacks;
     Esfera() {
@@ -168,67 +169,119 @@ public:
 class Caja : public Objeto {
 public:
     vec3 posmin, posmax;
+    float size;
     Caja() {
         posmin = vec3(0.0);
-        posmax = vec3(1.0);
+        posmax = vec3(0.0);
+        centro = vec3(0.0);
+    }
+    Caja(vec3 c, float s) {
+        posmin = vec3(0.0);
+        posmax = vec3(0.0);
+        centro = c;
+        size = s;
     }
     GLuint setup() {
-        GLfloat vertices[] = {
-            -1.0f,  1.0f,  0.0f,
-            -1.0f, -1.0f,  0.0f,
-             1.0f,  1.0f,  0.0f,
-             1.0f, -1.0f,  0.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-             1.0f,  1.0f, -1.0f,
-             1.0f, -1.0f, -1.0f
+        float Vertices[] = {
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+            0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
         };
 
-        unsigned int indices[] = {
-            0, 2, 3, 0, 3, 1,
-            2, 6, 7, 2, 7, 3,
-            6, 4, 5, 6, 5, 7,
-            4, 0, 1, 4, 1, 5,
-            0, 4, 6, 0, 6, 2,
-            1, 5, 7, 1, 7, 3,
-        };
 
-        GLuint VAO,VBO,IBO;
+        GLuint VAO,VBO;
         glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+
         glBindVertexArray(VAO);
 
-        glGenBuffers(1, &IBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0])*6, indices, GL_STATIC_DRAW);
-
-        glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0])*3, vertices, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
+        //position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        glBindVertexArray(0);
+        //texture coord attribute
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
 
         return VAO;
     }
     void display(Shader &sh) {
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, centro);
+        model = glm::scale(model, glm::vec3(size));
+        model = glm::translate(model, glm::vec3(0.5));
 
-        glBindVertexArray(this->vao);
+        
+        sh.setMat4("model", model);
 
-
-        glDrawElements(GL_TRIANGLES,6, GL_UNSIGNED_INT, 0);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        if (visible) {
+            glBindVertexArray(vao);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glBindVertexArray(0);
+        }
     }
-    void actualizarDatos(float t);
-    void calcularColision(vector<Objeto*> pObjetos);
-    void calcularBoundingBox();
+    void actualizarDatos(float t) {
+        if(afectaGravedad){
+            float g = 9.8;
+            centro.x = pos_ini.x + vel_ini.x * cos(radians(ang_ini)) * t;
+            centro.y = pos_ini.y + vel_ini.y * sin(radians(ang_ini)) * t - 0.5 * g * t * t;
+        }
+    }
+    void calcularColision(vector<Objeto*> pObjetos) {
+        for (auto &obj : pObjetos) {
+            if (obj != this && bb->Colision( *obj->bb)) {
+                // reacciónar a la colision
+                cout << "Colisiono\n";
+            }
+
+        }
+    }
+    void calcularBoundingBox() {
+        bb = new BoundingBox();
+        bb->min = centro - vec3(size/2);
+        bb->max = centro + vec3(size/2);
+    }
 };
 
 #endif //LEARNOPENGL_OBJETO_H
