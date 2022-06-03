@@ -35,6 +35,10 @@ public:
     bool visible=true;
     bool afectaGravedad=true;
     bool esPrincipal=false;
+    bool esEsfera = false;
+    bool esCubo = false;
+    bool proyectil_lanzado = false;
+    bool proyectil_listo = false;
     BoundingBox *bb;
     GLint POSITION_ATTRIBUTE=0, NORMAL_ATTRIBUTE=1, TEXCOORD0_ATTRIBUTE=8;
 
@@ -51,9 +55,18 @@ public:
                 this->bb->Colision( *obj->bb) && 
                 obj->visible &&
                 this->esPrincipal) {
-                // reacciónar a la colision
-                cout << "Colision \n";
-                obj->visible = false;
+                if(obj->esCubo){
+                    this->centro = vec3(0,0,0);
+                    this->vel_ini = vec3(0,0,0);
+                    this->pos_ini = vec3(0,0,0);
+                    this->afectaGravedad = false;
+                    this->proyectil_lanzado = false;
+                    this->proyectil_listo = false;
+                    cout << "Colision con cubo \n";
+                } 
+                else if(obj->esEsfera){
+                    obj->visible = false;
+                }
             }
         }
     }
@@ -70,6 +83,8 @@ public:
     Esfera(vec3 _centro,bool _esPrincipal=false) {
         centro = _centro;
         esPrincipal=_esPrincipal;
+        esEsfera = true;
+        esCubo = false;
     }
     Esfera(vec3 _centro, float _radius, int _slices, int _stacks) {
         centro = _centro;
@@ -185,6 +200,8 @@ public:
         posmax = vec3(0.0);
         centro = c;
         size = s;
+        esCubo = true;
+        esEsfera = false;
     }
     GLuint setup() {
         float Vertices[] = {
@@ -275,8 +292,8 @@ public:
     }
     void calcularBoundingBox() {
         bb = new BoundingBox();
-        bb->min = centro - vec3(size/2);
-        bb->max = centro + vec3(size/2);
+        bb->min = centro - vec3(size*0.98);
+        bb->max = centro + vec3(size*0.98);
     }
 };
 

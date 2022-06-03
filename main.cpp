@@ -23,8 +23,6 @@ Esfera esfera_plantilla(vec3(0),2., 100, 100);
 Esfera* esfera_prota = new Esfera(vec3(0,0,0),true); 
 float esfera_angulo = 0.0;
 float mouse_distancia = 0.0;
-bool proyectil_listo = false;
-bool proyectil_lanzado = false;
 
 // settings
 const unsigned int SCR_WIDTH = 1280;
@@ -43,8 +41,6 @@ float tiempoInicial = 0.0f, tiempoTranscurrido= 0.0f;
 
 // lighting
 glm::vec3 lightPos(30.2f, 10.0f, 2.0f);
-GLuint luna_vao;
-int luna_numIndices;
 GLint POSITION_ATTRIBUTE=0, NORMAL_ATTRIBUTE=1, TEXCOORD0_ATTRIBUTE=8;
 
 
@@ -56,7 +52,7 @@ void Escena1(){
     esfera_prota->afectaGravedad = false;
     pObjetos.emplace_back(esfera_prota);
 
-    Caja* caja = new Caja(vec3(-10,-103,0),100.0f);
+    Caja* caja = new Caja(vec3(-10,-103,-20),100.0f);
     caja->vao = caja->setup();
     caja->calcularBoundingBox();
     caja->afectaGravedad = false;
@@ -171,7 +167,9 @@ int main() {
 
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
+        if(pObjetos.size() > 2)
         lightingShader.setVec3("objectColor", 1.0f, 0.0f, 0.0f);
+        else lightingShader.setVec3("objectColor", 0.0f, 1.0f, 0.0f);
         lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightingShader.setVec3("lightPos", lightPos);
         lightingShader.setVec3("viewPos", camera.Position);
@@ -184,13 +182,11 @@ int main() {
 
         // cuboShader.setMat4("projection", projection);
         // cuboShader.setMat4("view", view);
-
         for (auto &obj : pObjetos ) {
             obj->actualizarDatos(tiempoTranscurrido);
             obj->calcularColision(pObjetos);
             obj->display(lightingShader);
         }
-
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -220,11 +216,11 @@ void processInput(GLFWwindow *window)
         camera.Position -= glm::normalize(glm::cross(camera.Front, camera.Up)) * camera.MovementSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && camera.Position.x < 40.0f)
         camera.Position += glm::normalize(glm::cross(camera.Front, camera.Up)) * camera.MovementSpeed;
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && camera.Position.x == 0.0f && !proyectil_lanzado){
-        if (!proyectil_listo){
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && camera.Position.x == 0.0f && !esfera_prota->proyectil_lanzado){
+        if (!esfera_prota->proyectil_listo){
             esfera_prota->calcularBoundingBox();
-            proyectil_listo = true;
-            proyectil_lanzado = true;
+            esfera_prota->proyectil_listo = true;
+            esfera_prota->proyectil_lanzado = true;
             esfera_prota->vel_ini = vec3(50*mouse_distancia,50*mouse_distancia,0);
             esfera_prota->pos_ini = esfera_prota->centro;
             esfera_prota->ang_ini = esfera_angulo - 180;
@@ -233,7 +229,15 @@ void processInput(GLFWwindow *window)
         }
     }
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE){
-        proyectil_listo = false;
+        esfera_prota->proyectil_listo = false;
+    }
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS){
+        esfera_prota->centro = vec3(0,0,0);
+        esfera_prota->vel_ini = vec3(0,0,0);
+        esfera_prota->pos_ini = vec3(0,0,0);
+        esfera_prota->afectaGravedad = false;
+        esfera_prota->proyectil_lanzado = false;
+        esfera_prota->proyectil_listo = false;
     }
     //cout << "Posicion: " << camera.Position.x << " " << camera.Position.y << " " << camera.Position.z << endl;
 }
