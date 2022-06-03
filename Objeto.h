@@ -33,6 +33,7 @@ public:
     mat4 model;
     bool visible=true;
     bool afectaGravedad=true;
+    bool esPrincipal=false;
     BoundingBox *bb;
     GLint POSITION_ATTRIBUTE=0, NORMAL_ATTRIBUTE=1, TEXCOORD0_ATTRIBUTE=8;
 
@@ -54,8 +55,9 @@ public:
     Esfera() {
         centro = vec3(0.0);
     }
-    Esfera(vec3 _centro) {
+    Esfera(vec3 _centro,bool _esPrincipal=false) {
         centro = _centro;
+        esPrincipal=_esPrincipal;
     }
     Esfera(vec3 _centro, float _radius, int _slices, int _stacks) {
         centro = _centro;
@@ -146,14 +148,19 @@ public:
             float g = 9.8;
             centro.x = pos_ini.x + vel_ini.x * cos(radians(ang_ini)) * t;
             centro.y = pos_ini.y + vel_ini.y * sin(radians(ang_ini)) * t - 0.5 * g * t * t;
+            calcularBoundingBox();
         }
         //cout<< t << "\t" << to_string(pos_ini) << "\t" << to_string(centro) << endl;
     }
     void calcularColision(vector<Objeto*> pObjetos) {
         for (auto &obj : pObjetos) {
-            if (obj != this && bb->Colision( *obj->bb)) {
+            if (obj != this &&
+                this->bb->Colision( *obj->bb) && 
+                obj->visible &&
+                this->esPrincipal) {
                 // reacciónar a la colision
-                cout << "Colisiono\n";
+                cout << "Colision \n";
+                
             }
 
         }
