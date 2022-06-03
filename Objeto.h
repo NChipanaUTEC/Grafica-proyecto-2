@@ -47,7 +47,7 @@ public:
     virtual void calcularBoundingBox() = 0;
 };
 
-class Esfera:public Objeto{
+class Esfera:public Objeto {
 public:
     vec3 centro;
     float radius;
@@ -144,7 +144,7 @@ public:
         }
     }
     void actualizarDatos(float t) {
-        if(afectaGravedad){
+        if(afectaGravedad) {
             float g = 9.8;
             centro.x = pos_ini.x + vel_ini.x * cos(radians(ang_ini)) * t;
             centro.y = pos_ini.y + vel_ini.y * sin(radians(ang_ini)) * t - 0.5 * g * t * t;
@@ -155,12 +155,12 @@ public:
     void calcularColision(vector<Objeto*> pObjetos) {
         for (auto &obj : pObjetos) {
             if (obj != this &&
-                this->bb->Colision( *obj->bb) && 
-                obj->visible &&
-                this->esPrincipal) {
+                    this->bb->Colision( *obj->bb) &&
+                    obj->visible &&
+                    this->esPrincipal) {
                 // reacciónar a la colision
                 cout << "Colision \n";
-                
+
             }
 
         }
